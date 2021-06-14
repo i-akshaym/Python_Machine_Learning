@@ -1,0 +1,109 @@
+# ===================
+# Imports
+# ===================
+
+
+import numpy as np
+import pandas as pd
+import seaborn as sb
+from seaborn import countplot
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure,show
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+# ===================
+# ML Operation
+# ===================
+
+    # Data Analysis
+
+def TitanicLogistic():          #step1-load data
+    titanic_data = pd.read_csv("TitanicDataset.csv")
+    print("First five records of datasets")
+    print(titanic_data.head())
+    print("Total no of records are:",len(titanic_data))
+    print("Dataset information: \n ",titanic_data.info())
+
+#step 2 analyse the data
+    
+
+    print("Visualisation of survived and non-survived passenger")
+    figure()
+    countplot(data=titanic_data, x="Survived").set_title("Survived vs Non-Survived")
+    #show()
+    
+    print("Visualisation according to gender")
+    figure()
+    countplot(data=titanic_data, x="Survived",hue="Sex").set_title("Visualisation according to gender")
+    #show()
+    
+    print("Visualisation according to Passenger class")
+    figure()
+    countplot(data=titanic_data, x="Survived",hue="Pclass").set_title("Visualisation according to Passenger class")
+    #show()
+    
+    print("Survived and Non-Survived based on Age")
+    figure()
+    titanic_data["Age"].plot.hist().set_title("Visualisation according to Age")
+    #show()
+
+# step 3 - data cleaning
+
+    titanic_data.drop("zero", axis=1,inplace=True)
+    print("Data after column removal")
+    print(titanic_data.head())
+
+    sex = pd.get_dummies(titanic_data["Sex"])
+    print(sex)
+    sex = pd.get_dummies(titanic_data["Sex"],drop_first=True)
+    print("sex column after updatation")
+    print(sex)
+    
+    pclass = pd.get_dummies(titanic_data["Pclass"],drop_first=True)
+    print(pclass.head)
+    
+    #concate sex and pclass field in out datasets 
+    titanic_data = pd.concat([titanic_data,sex,pclass],axis=1)
+    print("Data after concatination")
+    print(titanic_data.head())
+    
+    #removing unnecessary fields
+    titanic_data.drop(["Sex","sibsp","Parch","Embarked"],axis=1,inplace=True)
+    print("After removing Unnecessary column")
+    print(titanic_data.head())
+    
+    #divide the dataset into x and y
+    x = titanic_data.drop("Survived",axis=1)
+    y = titanic_data["Survived"]
+    
+    #split the data for training & testing purpose
+    x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.5)
+    
+    obj = LogisticRegression(max_iter=1000)
+    
+    # step 4- Train the dataset
+    obj.fit(x_train,y_train)
+    
+    #step5 testing
+    output = obj.predict(x_test)
+    
+    print("Accuracy of Gven Dataset is :")
+    print(accuracy_score(y_test,output))
+    
+    print("Confusion matrix is:")
+    print(confusion_matrix(y_test,output))
+    
+    
+
+def main(): 
+
+    print("Logistics case study")
+    
+    TitanicLogistic()
+
+
+
+if __name__ == "__main__":
+    main()  
